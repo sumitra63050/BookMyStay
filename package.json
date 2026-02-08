@@ -1,8 +1,7 @@
 {
-  "engines":{
-   "node":"v22.14.0"
-},
-
+  "engines": {
+    "node": "v22.14.0"
+  },
   "name": "bookmyshow",
   "version": "1.0.0",
   "main": "index.js",
@@ -14,7 +13,7 @@
   "description": "",
   "dependencies": {
     "axios": "^1.13.4",
-    "cloudinary": "^2.9.0",
+    "cloudinary": "^1.41.3",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.3",
@@ -26,7 +25,7 @@
     "method-override": "^3.0.0",
     "mongoose": "^9.1.5",
     "multer": "^2.0.2",
-    "multer-storage-cloudinary": "^4.0.0",
+    "multer-storage-cloudinary": "^3.0.0",
     "nodemon": "^3.1.11",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
