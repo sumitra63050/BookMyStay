@@ -253,6 +253,12 @@ app.use((err,req,res,next)=>{
      res.send("something went wrong");
 }); */
 
-app.listen(8080,()=>{
-    console.log("connncetion is successful 8080");
+const PORT = process.env.PORT || 8080;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
+
+/* app.listen(8080,()=>{
+    console.log("connncetion is successful 8080");
+}); */
