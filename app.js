@@ -10,7 +10,7 @@ const mongoose = require('mongoose');
 //const Listing = require("./models/listing.js");
 const path = require("path");
 const methodOverride = require("method-override");
-const MONGO_URL = "mongodb://127.0.0.1:27017/bookstay";
+//const MONGO_URL = "mongodb://127.0.0.1:27017/bookstay";
 const ejsMate = require("ejs-mate");
 //const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError = require("./utils/ExpressError.js");
@@ -21,6 +21,7 @@ const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const flash = require('connect-flash');
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
@@ -33,7 +34,7 @@ main().then(() =>{
     console.log(err);
 });
 async function main(){
-    await mongoose.connect(MONGO_URL);
+    await mongoose.connect(process.env.MONGO_URL);
 }
 
 app.use(cookieParser());
@@ -43,7 +44,21 @@ app.use(express.urlencoded({extended: true}));
 app.use(methodOverride("_method"));
 app.engine('ejs', ejsMate);
 app.use(express.static(path.join(__dirname , "/public")));
-const sessionOptions = { 
+
+const store = MongoStore.create({
+    mongoUrl: process.env.MONGO_URL,
+    crypto:{
+         secret: "mysecretkey"
+    },
+    touchAfter: 24*3600,
+  });
+
+store.on("error" , ()=>{
+    console.log("error in mongo session" , err);
+});
+
+const sessionOptions = {
+    store, 
     secret: "mysecretkey", 
     resave: false,
     saveUninitialized:true,
@@ -53,6 +68,8 @@ const sessionOptions = {
      httpOnly: true,
     },
 };
+
+
 
 // app.get("/" , (req,res)=>{
 //     res.send("sucessful connnection");
