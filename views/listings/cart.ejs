@@ -1,0 +1,76 @@
+<% layout("/layouts/boilerplate") -%>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12 col-md-10 offset-md-1">
+            <h2 class="mb-4"><i class="fa-solid fa-cart-shopping me-2"></i>My Cart</h2>
+            
+            <% if (cartItems.length === 0) { %>
+                <div class="card text-center p-5 shadow-sm border-0 bg-light">
+                    <div class="card-body">
+                        <i class="fa-regular fa-folder-open fa-4x mb-3 text-muted"></i>
+                        <h3 class="card-title">Your cart is empty</h3>
+                        <p class="card-text text-muted">Explore our amazing listings and add them to your cart!</p>
+                        <a href="/listings" class="btn btn-danger rounded-pill px-4 mt-3">Explore Now</a>
+                    </div>
+                </div>
+            <% } else { %>
+                <div class="row">
+                    <div class="col-lg-8">
+                        <% for(let item of cartItems) { %>
+                            <div class="card mb-3 shadow-sm border-0 listing-card">
+                                <div class="row g-0">
+                                    <div class="col-md-4">
+                                        <img src="<%= (item.images && item.images.length > 0) ? item.images[0].url : 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8aG90ZWxzfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60' %>" class="img-fluid rounded-start h-100" style="object-fit: cover; min-height: 150px;" alt="listing_image">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <h5 class="card-title text-truncate" style="max-width: 250px;"><%= item.title %></h5>
+                                                <form action="/listings/<%= item._id %>/cart?_method=DELETE" method="POST">
+                                                    <button class="btn btn-outline-danger btn-sm border-0"><i class="fa-solid fa-trash"></i></button>
+                                                </form>
+                                            </div>
+                                            <p class="card-text text-muted mb-2"><i class="fa-solid fa-location-dot me-1"></i><%= item.location %>, <%= item.country %></p>
+                                            <p class="card-text">
+                                                <strong>&#8377;<%= Number(item.price).toLocaleString("en-IN") %></strong> / night
+                                            </p>
+                                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                                <a href="/listings/<%= item._id %>" class="btn btn-sm btn-outline-dark rounded-pill px-3">View Details</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="card shadow-sm border-0 p-3 sticky-top" style="top: 100px;">
+                            <h4 class="mb-4">Order Summary</h4>
+                            <% 
+                                let subtotal = cartItems.reduce((acc, item) => acc + item.price, 0);
+                                let gst = Math.round(subtotal * 0.18);
+                                let total = subtotal + gst;
+                            %>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal</span>
+                                <span>&#8377;<%= subtotal.toLocaleString("en-IN") %></span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Tax (GST 18%)</span>
+                                <span>&#8377;<%= gst.toLocaleString("en-IN") %></span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-4">
+                                <strong>Total</strong>
+                                <strong class="text-danger">&#8377;<%= total.toLocaleString("en-IN") %></strong>
+                            </div>
+                            <button class="btn btn-danger w-100 rounded-pill py-2 fw-bold">Proceed to Book</button>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+<br><br>

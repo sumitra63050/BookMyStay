@@ -28,6 +28,7 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
 const userRouter = require("./routes/user.js");
+const cartRouter = require("./routes/cart.js");
 
 main().then(() => {
     console.log("coneected to DB");
@@ -72,9 +73,9 @@ const sessionOptions = {
 
 
 
-// app.get("/" , (req,res)=>{
-//     res.send("sucessful connnection");
-// });
+app.get("/", (req, res) => {
+    res.redirect("/listings");
+});
 
 app.use(session(sessionOptions));
 app.use(flash());
@@ -88,7 +89,11 @@ passport.deserializeUser(User.deserializeUser());
 app.use((req, res, next) => {
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
-    res.locals.currUser = req.user;//jo bhi user ka session chal rha hai uski info currUser variable me store kar denge
+    res.locals.currUser = req.user;
+    res.locals.q = req.query.q || "";
+    res.locals.category = req.query.category || "";
+    // Robust check for cartCount
+    res.locals.cartSum = (req.user && req.user.cart) ? req.user.cart.length : 0;
     next();
 });
 
@@ -145,9 +150,10 @@ app.get("/hello" , (req,res)=>{
     }
 }; */
 
-app.use("/listings", listingRouter); // For listing Router
-app.use("/listings/:id/reviews", reviewRouter);//for review router
-app.use("/", userRouter);//for user Router
+app.use("/listings", listingRouter);
+app.use("/listings/:id/reviews", reviewRouter);
+app.use("/", userRouter);
+app.use("/", cartRouter);
 
 //cokoies 
 /* app.get("/setcookies" , (req,res)=>{

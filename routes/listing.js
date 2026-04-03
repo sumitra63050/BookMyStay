@@ -80,7 +80,7 @@ router.get("/:id",wrapAsync(listingController.showListing));
        res.redirect("/listings");
 })); */
 
-router.post("/" , isLoggedIn , validateListing, upload.single('listing[image]'),wrapAsync(listingController.createListing));
+router.post("/" , isLoggedIn , upload.array('listing[images]', 6),validateListing,wrapAsync(listingController.createListing));
 /* router.post("/" , upload.single('listing[image]'),  (req,res)=>{
     res.send(req.file);
 }); */
@@ -106,7 +106,7 @@ router.get("/:id/edit", isLoggedIn, isOwner, wrapAsync(listingController.renderE
       res.redirect(`/listings/${id}`);
 })); */
 
-router.put("/:id" ,  isLoggedIn , isOwner,upload.single('listing[image]'),validateListing , wrapAsync(listingController.updateListing));
+router.put("/:id" ,  isLoggedIn , isOwner,upload.array('listing[images]', 6),validateListing , wrapAsync(listingController.updateListing));
 
 //Delete Route
 /* router.delete("/:id" , isLoggedIn ,isOwner, wrapAsync(async (req , res)=>{

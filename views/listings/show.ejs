@@ -1,18 +1,46 @@
 <% layout("/layouts/boilerplate") -%>
     <div class="row">
-        <div class="col-8 offset-2">
-            <br><br>
-            <h3 class="list-head">
-                <%= listing.title %>
-            </h3><br>
+        <div class="col-12 col-md-8 offset-md-2">
+            <h3 class="list-head mt-3"><%= listing.title %></h3>
         </div>
 
-        <div class="card col-6 offset-3 show-card listing-card">
-            <img src="<%= listing.image.url%>" class="card-img-top show-img" alt="listing_image">
-            <div class="card-body">
-                <p class="card-text">Owned by
+        <div class="card col-12 col-md-10 offset-md-1 col-lg-6 offset-lg-3 show-card listing-card px-0">
+             <div id="listingCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <% if (listing.images && listing.images.length > 1) { %>
+                        <% listing.images.forEach((img, index) => { %>
+                            <button type="button" data-bs-target="#listingCarousel" data-bs-slide-to="<%= index %>" class="<%= index === 0 ? 'active' : '' %>" aria-current="<%= index === 0 ? 'true' : 'false' %>" aria-label="Slide <%= index + 1 %>"></button>
+                        <% }) %>
+                    <% } %>
+                </div>
+                <div class="carousel-inner">
+                    <% if (listing.images && listing.images.length > 0) { %>
+                        <% listing.images.forEach((img, index) => { %>
+                            <div class="carousel-item <%= index === 0 ? 'active' : '' %>">
+                                <img src="<%= img.url %>" class="d-block w-100 show-img" alt="listing_image" style="height: 30rem; object-fit: cover;">
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div class="carousel-item active">
+                            <img src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8aG90ZWxzfGVufDB8fDB8fHww&auto=format&fit=crop&w=800&q=60" class="d-block w-100 show-img" alt="listing_image" style="height: 30rem; object-fit: cover;">
+                        </div>
+                    <% } %>
+                </div>
+                <% if (listing.images.length > 1) { %>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#listingCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#listingCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                <% } %>
+            </div>
+            <div class="card-body px-3">
+                <p class="card-text mt-2">Owned by
                     <i>
-                        <%= listing.owner.username %>
+                        <%= listing.owner ? listing.owner.username : "Anonymous" %>
                     </i>
                 </p>
 
@@ -22,27 +50,36 @@
                 <p class="card-text">
                     &#8377;<%= Number(listing.price).toLocaleString("en-IN") %>
                 </p>
+                
+                <div class="d-flex gap-2 align-items-center mb-3">
+                    <% if(currUser) { %>
+                        <form method="POST" action="/listings/<%= listing._id %>/cart">
+                            <button class="btn btn-outline-primary rounded-pill px-4">Add to Cart</button>
+                        </form>
+                    <% } %>
+                    <a href="https://wa.me/?text=Check out this amazing stay: <%= listing.title %> in <%= listing.location %>! Book now on BookMyStay." 
+                       class="btn btn-success rounded-pill px-4" target="_blank">
+                        <i class="fa-brands fa-whatsapp me-2"></i>Share
+                    </a>
+                </div>
+
                 <p class="card-text">
-                    <%= listing.location %>
-                </p>
-                <p class="card-text">
-                    <%= listing.country %>
+                    <i class="fa-solid fa-location-dot me-2"></i><%= listing.location %>, <%= listing.country %>
                 </p>
             </div>
         </div>
     </div>
 
-    <% if(currUser && currUser._id.equals(listing.owner._id)) { %>
-        <div class="btns">
-            <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark col-1 offset-3 edit-btn">Edit </a><br>
-
-            <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
-                <button class="btn btn-dark offset-4">Delete</button>
+    <% if(currUser && listing.owner && currUser._id.equals(listing.owner._id)) { %>
+        <div class="btns mb-3 d-flex align-items-center justify-content-start gap-3 col-12 col-md-10 offset-md-1 col-lg-6 offset-lg-3">
+            <a href="/listings/<%= listing._id %>/edit" class="btn btn-dark edit-btn px-4">Edit Listing</a>
+            <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" class="d-inline">
+                <button class="btn btn-dark px-4">Delete</button>
             </form>
         </div>
         <%}%>
 
-            <div class="col-8 offset-3 mb-3">
+            <div class="col-12 col-md-8 offset-md-3 mb-3">
                 <hr />
                 <% if(currUser){%>
                     <h4>Leave a Review </h4>
@@ -77,30 +114,32 @@
                         </div>
                         <button class="btn btn-outline-dark">Submit</button>
                     </form>
+                <%}%>
             </div>
-            <%}%>
 
-        <div class="col-8 offset-3 mb-3">
+        <div class="col-12 col-md-8 offset-md-3 mb-3">
             <% if(listing.reviews.length > 0) { %>
             <hr />
             <p><b>All Reviews</b></p>
             <div class="row">
                 <% for(let review of listing.reviews){ %>
-                <div class="card col-5 ms-3 mb-3">
+                <div class="card col-12 col-sm-10 col-md-5 ms-md-3 mb-3">
                     <div class="card-body">
                         <h5 class="card-title">@<%= review.author ? review.author.username : "Anonymous" %></h5>
                         <p class="starability-result card-text" data-rating="<%= review.rating %>"></p>
                         <p class="card-text"><%= review.comment %></p>
+                        <% if(currUser && review.author && currUser._id.equals(review.author._id)) { %>
                         <form class="mb-3" method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
                             <button class="btn btn-sm btn-dark">Delete</button>
                         </form>
+                        <% } %>
                     </div>
                 </div>
                 <% } %>
             </div>
             <% } %>
         </div>
-        <div class="col-8 offset-3 mb-3">
+        <div class="col-12 col-md-8 offset-md-3 mb-3">
             <hr>
             <h3>Where you'll be</h3>
             <div id="map"></div>

@@ -8,14 +8,12 @@ const listingSchema = new Schema({
     required : true,
     },
     description:String,
-    image:{
-        url: String,
-        filename:String
-     /* type: String,
-     default:"https://tse1.mm.bing.net/th/id/OIP.nPg5KdZinIajREKck8dlnQHaE7?pid=Api&P=0&h=180",
-     set: (v)=>
-        v=== ""?"https://tse1.mm.bing.net/th/id/OIP.nPg5KdZinIajREKck8dlnQHaE7?pid=Api&P=0&h=180":v, */
-    },
+    images: [
+        {
+            url: String,
+            filename: String
+        }
+    ],
     price:Number,
     location:String,
     country:String,
@@ -40,7 +38,12 @@ const listingSchema = new Schema({
     required: true
   }
 },
-
+category: {
+    type: String,
+    enum: ["Trending", "Rooms", "Iconic Cities", "Mountains", "Castles", "Amazing Pools", "Camping", "Farms", "Arctic", "Domes", "Boats"],
+    required: true,
+    default: "Trending"
+}
 });
 
 listingSchema.post("findOneAndDelete",async(listing)=>{
