@@ -1,5 +1,5 @@
-if(process.env.NODE_ENV != "production"){
-   require('dotenv').config();
+if (process.env.NODE_ENV != "production") {
+    require('dotenv').config();
 }
 
 //console.log(process.env.SECRET);
@@ -21,51 +21,52 @@ const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const MongoStore = require('connect-mongo');
+const connectMongo = require('connect-mongo');
+const MongoStore = connectMongo.MongoStore || connectMongo.default || connectMongo;
 const flash = require('connect-flash');
 const passport = require("passport");
 const LocalStrategy = require("passport-local");
 const User = require("./models/user.js");
 const userRouter = require("./routes/user.js");
 
-main().then(() =>{
+main().then(() => {
     console.log("coneected to DB");
-}).catch((err) =>{
+}).catch((err) => {
     console.log(err);
 });
-async function main(){
+async function main() {
     await mongoose.connect(process.env.MONGO_URL);
 }
 
 app.use(cookieParser());
-app.set("view engine" , "ejs");
-app.set("views" , path.join(__dirname, "views"));
-app.use(express.urlencoded({extended: true}));
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride("_method"));
 app.engine('ejs', ejsMate);
-app.use(express.static(path.join(__dirname , "/public")));
+app.use(express.static(path.join(__dirname, "/public")));
 
 const store = MongoStore.create({
     mongoUrl: process.env.MONGO_URL,
-    crypto:{
-         secret: "mysecretkey"
+    crypto: {
+        secret: process.env.SECRET
     },
-    touchAfter: 24*3600,
-  });
+    touchAfter: 24 * 3600,
+});
 
-store.on("error" , ()=>{
-    console.log("error in mongo session" , err);
+store.on("error", () => {
+    console.log("error in mongo session", err);
 });
 
 const sessionOptions = {
-    store, 
-    secret: "mysecretkey", 
+    store,
+    secret: process.env.SECRET,
     resave: false,
-    saveUninitialized:true,
-    cookie :{
-     expires: Date.now()+7*24*60*60*1000,
-     maxAge:7*24*60*60*1000,
-     httpOnly: true,
+    saveUninitialized: true,
+    cookie: {
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
     },
 };
 
@@ -84,10 +85,10 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 
-app.use((req,res,next)=>{
+app.use((req, res, next) => {
     res.locals.success = req.flash("success");
-     res.locals.error = req.flash("error");
-     res.locals.currUser = req.user;//jo bhi user ka session chal rha hai uski info currUser variable me store kar denge
+    res.locals.error = req.flash("error");
+    res.locals.currUser = req.user;//jo bhi user ka session chal rha hai uski info currUser variable me store kar denge
     next();
 });
 
@@ -102,7 +103,7 @@ app.use((req,res,next)=>{
       res.send(registeredUser);
 }); */
 
-/*for express session*/ 
+/*for express session*/
 /* app.get("/testsession" , (req,res)=>{
     res.send("testing for express session");
 }); */
@@ -118,7 +119,7 @@ app.use((req,res,next)=>{
 app.get("/hello" , (req,res)=>{
     res.send(`hello, ${req.session.name}`);
 });*/
- 
+
 
 /*for listing validate*/
 /* const validateListing = (req,res,next) => {
@@ -144,9 +145,9 @@ app.get("/hello" , (req,res)=>{
     }
 }; */
 
-app.use("/listings" , listingRouter); // For listing Router
-app.use("/listings/:id/reviews" , reviewRouter);//for review router
-app.use("/" , userRouter);//for user Router
+app.use("/listings", listingRouter); // For listing Router
+app.use("/listings/:id/reviews", reviewRouter);//for review router
+app.use("/", userRouter);//for user Router
 
 //cokoies 
 /* app.get("/setcookies" , (req,res)=>{
@@ -255,16 +256,19 @@ app.delete("/listings/:id/reviews/:reviewId" , wrapAsync(async(req , res)=> {
        res.redirect(`/listings/${id}`);
 })); */
 
-app.use((req,res,next)=>{
-     next(new ExpressError(404, "page not found!"));
+app.use((req, res, next) => {
+    next(new ExpressError(404, "page not found!"));
 });
 
 //Error Middleware
-app.use((err,req,res,next)=>{
-     let { statusCode=500,message= "something wrong"}=err;
-     //console.log(err);
-     res.status(statusCode).render("error.ejs" ,{message});
-     //res.status(statusCode).send(message);
+app.use((err, req, res, next) => {
+    let { statusCode = 500, message = "something wrong" } = err;
+    res.locals.success = res.locals.success || "";
+    res.locals.error = res.locals.error || "";
+    res.locals.currUser = res.locals.currUser || null;
+    //console.log(err);
+    res.status(statusCode).render("error.ejs", { message });
+    //res.status(statusCode).send(message);
 });
 /* app.use((err,req,res,next)=>{
      res.send("something went wrong");
@@ -273,7 +277,7 @@ app.use((err,req,res,next)=>{
 const PORT = process.env.PORT || 8080;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
 
 /* app.listen(8080,()=>{

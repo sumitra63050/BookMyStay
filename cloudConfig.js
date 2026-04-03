@@ -9,10 +9,10 @@ cloudinary.config({
 
 
 const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
+  cloudinary: require('cloudinary'),
   params: {
     folder: 'BookMyStay_DEV',
-    allowerdFormats: ["png","jpg","jpeg"],// supports promises as well
+    allowedFormats: ["png","jpg","jpeg"],// supports promises as well
   },
 });
 

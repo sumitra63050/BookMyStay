@@ -13,6 +13,7 @@ const {storage} = require("../cloudConfig.js");
 //const upload = multer({ dest: 'uploads/' });
 const upload = multer({storage});
 
+
 //console.log(isLoggedIn);
 /* const validateListing = (req,res,next) => {
     let {error} = listingSchema.validate(req.body);//used Joi 

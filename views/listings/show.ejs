@@ -80,51 +80,40 @@
             </div>
             <%}%>
 
-
-                <p><b>All Reviews</b></p>
-
-                <div class="row justify-content-center">
-                    <% for(let review of listing.reviews){ %>
-                        <div class="col-md-5 mb-3">
-                            <div class="card ">
-
-                                <div class="card-body">
-                                    <h5 class="card-title">@
-                                        <% if(review.author) {%>
-                                            <%= review.author.username%>
-                                                <%} else{%>
-                                                    Anonymous
-                                                    <%}%>
-                                    </h5>
-
-                                    <p class="starability-result card-text" data-rating="<%= review.rating %>">
-                                    </p>
-                                    <p class="card-text">
-                                        <%= review.comment %>
-                                    </p>
-                                    <br>
-                                    <form class="mb-3" method="POST"
-                                        action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
-                                        <button class="btn btn-sm btn-dark">Delete</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        <% } %>
+        <div class="col-8 offset-3 mb-3">
+            <% if(listing.reviews.length > 0) { %>
+            <hr />
+            <p><b>All Reviews</b></p>
+            <div class="row">
+                <% for(let review of listing.reviews){ %>
+                <div class="card col-5 ms-3 mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">@<%= review.author ? review.author.username : "Anonymous" %></h5>
+                        <p class="starability-result card-text" data-rating="<%= review.rating %>"></p>
+                        <p class="card-text"><%= review.comment %></p>
+                        <form class="mb-3" method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+                            <button class="btn btn-sm btn-dark">Delete</button>
+                        </form>
+                    </div>
                 </div>
+                <% } %>
+            </div>
+            <% } %>
+        </div>
+        <div class="col-8 offset-3 mb-3">
+            <hr>
+            <h3>Where you'll be</h3>
+            <div id="map"></div>
+        </div>
 
-                <br><br>
-
-                <hr>
-                <h3>Location</h3>
-                <div id="map">
-
-                </div>
-
-                <script>
-                    var map = L.map('map').setView([26.26841, 73.00594], 13);//long,lat
-                    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        maxZoom: 19,
-                        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                    }).addTo(map);
-                </script>
+        <script>
+            // Pass coordinates from server to map.js
+            // Default to New Delhi if geometry is missing
+            <% if (listing.geometry && listing.geometry.coordinates && listing.geometry.coordinates.length == 2) { %>
+                var lng = <%= listing.geometry.coordinates[0] %>;
+                var lat = <%= listing.geometry.coordinates[1] %>;
+            <% } else { %>
+                var lng = 77.2090;
+                var lat = 28.6139;
+            <% } %>
+        </script>
